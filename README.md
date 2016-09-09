@@ -1,6 +1,15 @@
 # artLog
 A tiny, flexible and thread-safe C++ logger for developers
 
+## Compile
+You can compile the artlog as a static link library or a dynamic link library, based on your preferences. The CMake tool is required to build the libraries using our CMakeLists.txt. The procedure is quit simple on Linux system:
+- mkdir build
+- cd build
+- cmake ..
+- make
+
+That's all, and you can find the samples in 'build/bin' directory, and the libraries are in 'build/lib' directory.
+
 ## Usage
 artLog is easy to use. Basically, it could be used in two styles:
 - art::LOG*() Macro style 
