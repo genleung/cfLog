@@ -1,0 +1,58 @@
+#include "Log.h"
+#include <thread>
+
+using namespace art;
+using namespace std;
+
+void threadFunc(int id){
+    setLogFile("threads.txt", true);
+    LOG()<<"DD in thread "<<id;
+
+    Log log;
+    log.setLogFile("threads.txt", true);
+    log()<<"thread " << id;
+}
+
+int main(){
+    int a=123;
+    char ch='a';
+    float f=1.234;
+    const char *str="hello world";
+       
+    setLogLevel(LogLevel::INFO);
+    enableLogPosition(true);
+    setLogFile("test.txt", true);
+    LOG()<<a<<":Hello!!!";
+    setLogFile("log.txt", true);
+    DLOG("world!");
+    LOGL(ERROR)<<"error!";
+    setLogFile();
+    LOGL(WARNING)<<"warning...";
+    DLOGL(ERROR, "debug error");
+    
+    LOGF("hello int:%d, char:%c, float:%f, string:%s", a, ch, f, str);
+    DLOGLF(ERROR, "hello int:%d, char:%c, float:%f, string:%s", a, ch, f, str);
+
+    art::Log log;
+    log()<<"kaka";
+    log(LogLevel::WARNING)<<"This is a warning";
+
+    DLOGF("dummy format string");
+   
+   
+    // 多线程测试
+    std::thread t[3];
+    for(int i=0; i<sizeof(t)/sizeof(t[0]); i++){
+        t[i]=std::thread(threadFunc, i);
+    }
+    
+    for(int i=0; i<sizeof(t)/sizeof(t[0]); i++){
+        t[i].join();
+    }
+        
+
+    return 0;
+    
+    
+
+}
