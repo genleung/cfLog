@@ -1,5 +1,6 @@
 #include "Log.h"
 #include <thread>
+#include <string>
 
 using namespace art;
 using namespace std;
@@ -38,6 +39,8 @@ int main(){
     log(LogLevel::WARNING)<<"This is a warning";
 
     DLOGF("dummy format string");
+    std::string str2="string test";
+    DLOGF("where is the string:%s", str2.c_str());
    
    
     // 多线程测试
