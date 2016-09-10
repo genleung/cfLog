@@ -110,7 +110,8 @@ namespace art{
             ss<<levelStr[(int)curLevel]<<std::put_time(std::localtime(&now_c), "[%Y-%m-%d %T]");
 
             if(_positionEnabled && srcFile.length()){
-                ss<<"["<<srcFile<<":"<<srcLine<<"] ";
+                // 获得srcFile路径中的最后文件名
+                ss<<"["<<srcFile.substr(srcFile.find_last_of("/\\") + 1)<<":"<<srcLine<<"] ";
             }else{
                 ss<<" ";
             }
