@@ -78,8 +78,45 @@ namespace art{
         _level=level;
     }
     
-    void Log::enableLogPosition(bool flag){
-        _positionEnabled=flag;
+    void Log::enableLogPosition(bool enabled, bool fullpathEnabled){
+        _positionEnabled=enabled;
+        _positionFullpathEnabled=fullpathEnabled;
+    }
+
+    void Log::enableLogTime(bool flag){
+        _timeEnabled=flag;
+    }
+
+    /// 创建LogStream对象.
+    /// 首先把当前的log等级、log位置、log时间写入到LogStream对象中，再返回此对象
+    /// @param curLevel [IN] 当前的log等级 
+    /// @param srcFile [IN] 当前进行log动作的文件
+    /// @param srcLine [IN] 当前进行log动作的代码行
+    LogStream Log::createLogStream(LogLevel curLevel, std::string srcFile, int srcLine){
+        const static char* levelStr[] = { "[I]", "[W]", "[E]", "[F]"};
+        std::stringstream ss;
+        std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
+        std::time_t now_c = std::chrono::system_clock::to_time_t(now - std::chrono::hours(24));
+
+        ss<<levelStr[(int)curLevel];
+
+        if(_timeEnabled){        
+            ss<<std::put_time(std::localtime(&now_c), "[%Y-%m-%d %T]");
+        }
+
+        if(_positionEnabled && srcFile.length()){
+            if(_positionFullpathEnabled){
+                // 获得srcFile的完整路径，以及log发生的所在行
+                ss<<"["<<srcFile<<":"<<srcLine<<"] ";
+            }else{
+                // 仅获得srcFile路径中的最后文件名，以及log发生的所在行
+                ss<<"["<<srcFile.substr(srcFile.find_last_of("/\\") + 1)<<":"<<srcLine<<"] ";
+            }
+        }else{
+            ss<<" ";
+        }
+
+        return LogStream(this, curLevel, ss.str());
     }
 
     //---------------------------------------------------------------------------
@@ -141,8 +178,12 @@ namespace art{
         Log::instance()->setLogFile(file, append);
     }
     
-    void enableLogPosition(bool flag){
-        Log::instance()->enableLogPosition(flag);
+    void enableLogPosition(bool enabled, bool fullpathEnabled){
+        Log::instance()->enableLogPosition(enabled, fullpathEnabled);
+    } 
+
+    void enableLogTime(bool enabled){
+        Log::instance()->enableLogTime(enabled);
     } 
        
     /// 处理格式化可变参数的辅助函数

@@ -14,34 +14,35 @@
 #include <iomanip>
 #include "LogStream.h"
 
+/// 以LogLevel::INFO等级调用单例Log对象.
+#define LOG() art::Log::instance()->createLogStream(art::LogLevel::INFO, __FILE__, __LINE__)
+/// 以指定等级调用单例Log对象.
+#define LOGL(level) art::Log::instance()->createLogStream(art::LogLevel::level, __FILE__, __LINE__ )
+/// 以LogLevel::INFO等级输出可变参数格式的log信息.
+#define LOGF(format, ...) LOG()<<formatString((char*)format,##__VA_ARGS__)
+/// 以指定等级输出可变参数格式的log信息.
+#define LOGLF(level, format, ...) LOGL(level)<<formatString((char*)format,##__VA_ARGS__)
+
+///
+/// 通过定义NDEBUG可以切换Log是否显示；若已经定义NDEBUG，则DLOG*系列宏并不输出log信息.     
+/// 
+#ifndef NDEBUG
+    /// Debug模式下，以LogLevel::INFO等级调用单例Log对象
+    #define DLOG(msg) LOG()<<msg
+    /// Debug模式下，以指定等级调用单例Log对象        
+    #define DLOGL(level, msg) LOGL(level)<<msg
+    /// Debug模式下，以LogLevel::INFO等级输出可变参数格式的log信息
+    #define DLOGF(format, ...) DLOG(formatString((char*)format,##__VA_ARGS__))
+    /// Debug模式下，以指定等级输出可变参数格式的log信息
+    #define DLOGLF(level, format, ...) DLOGL(level, formatString((char*)format,##__VA_ARGS__))
+#else 
+    #define DLOG(msg) do{}while(0)
+    #define DLOGL(level, msg) do{}while(0)
+    #define DLOGF(format, ...) do{}while(0)
+    #define DLOGLF(level, format, ...) do{}while(0)
+#endif  
+
 namespace art{
-    /// 以LogLevel::INFO等级调用单例Log对象.
-    #define LOG() Log::instance()->createLogStream( LogLevel::INFO, __FILE__, __LINE__)
-    /// 以指定等级调用单例Log对象.
-    #define LOGL(level) Log::instance()->createLogStream(LogLevel::level, __FILE__, __LINE__ )
-    /// 以LogLevel::INFO等级输出可变参数格式的log信息.
-    #define LOGF(format, ...) LOG()<<formatString((char*)format,##__VA_ARGS__)
-    /// 以指定等级输出可变参数格式的log信息.
-    #define LOGLF(level, format, ...) LOGL(level)<<formatString((char*)format,##__VA_ARGS__)
-    
-    ///
-    /// 通过定义NDEBUG可以切换Log是否显示；若已经定义NDEBUG，则DLOG*系列宏并不输出log信息.     
-    /// 
-    #ifndef NDEBUG
-        /// Debug模式下，以LogLevel::INFO等级调用单例Log对象
-        #define DLOG(msg) LOG()<<msg
-        /// Debug模式下，以指定等级调用单例Log对象        
-        #define DLOGL(level, msg) LOGL(level)<<msg
-        /// Debug模式下，以LogLevel::INFO等级输出可变参数格式的log信息
-        #define DLOGF(format, ...) DLOG(formatString((char*)format,##__VA_ARGS__))
-        /// Debug模式下，以指定等级输出可变参数格式的log信息
-        #define DLOGLF(level, format, ...) DLOGL(level, formatString((char*)format,##__VA_ARGS__))
-    #else 
-        #define DLOG(msg) do{}while(0)
-        #define DLOGL(level, msg) do{}while(0)
-        #define DLOGF(format, ...) do{}while(0)
-        #define DLOGLF(level, format, ...) do{}while(0)
-    #endif  
 
     /// log的等级.
     enum class LogLevel:int{
@@ -101,23 +102,7 @@ namespace art{
         /// @param curLevel [IN] 当前的log等级 
         /// @param srcFile [IN] 当前进行log动作的文件
         /// @param srcLine [IN] 当前进行log动作的代码行
-        LogStream createLogStream(LogLevel curLevel, std::string srcFile, int srcLine){
-            const static char* levelStr[] = { "[I]", "[W]", "[E]", "[F]"};
-            std::stringstream ss;
-            std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
-            std::time_t now_c = std::chrono::system_clock::to_time_t(now - std::chrono::hours(24));
-
-            ss<<levelStr[(int)curLevel]<<std::put_time(std::localtime(&now_c), "[%Y-%m-%d %T]");
-
-            if(_positionEnabled && srcFile.length()){
-                // 获得srcFile路径中的最后文件名
-                ss<<"["<<srcFile.substr(srcFile.find_last_of("/\\") + 1)<<":"<<srcLine<<"] ";
-            }else{
-                ss<<" ";
-            }
-
-            return LogStream(this, curLevel, ss.str());
-        }
+        LogStream createLogStream(LogLevel curLevel, std::string srcFile, int srcLine);
 
         // ------------------------------------------------------
         // 一般公共成员函数
@@ -130,7 +115,9 @@ namespace art{
         /// 设置log的阈值等级.
         void setLogLevel(LogLevel level);
         /// 是否允许记录进行log的文件名和行号.
-        void enableLogPosition(bool flag);
+        void enableLogPosition(bool enabled, bool fullpathEnabled=false);
+        /// 是否允许记录进行log的时间
+        void enableLogTime(bool flag);
 
     private:
         /// 禁止拷贝构造.
@@ -153,8 +140,12 @@ namespace art{
         static std::shared_ptr<Log> _ptr;
         /// Log阈值，当log动作对应的log等级必须大于或等于Log阈值，log信息才会被记录下来.
         LogLevel _level = LogLevel::INFO; 
-        /// 是否允许显示Log位置.
-        bool _positionEnabled = true;        
+        /// 是否允许显示log位置.
+        bool _positionEnabled = true;    
+        /// 是否记录完整的文件名路径(此开关在_positionEanbled被启用的前提下有效)
+        bool _positionFullpathEnabled = false;
+        /// 是否允许显示log时间
+        bool _timeEnabled = true; 
         /// Log输出流.
 		std::ostream* _os = nullptr;   
         /// Log输出文件.
@@ -170,7 +161,8 @@ namespace art{
     void setLogLevel(LogLevel level);   
     void setLogFile();
     void setLogFile(std::string file, bool append=false);
-    void enableLogPosition(bool flag);
+    void enableLogPosition(bool enabled, bool fullpathEnabled);
+    void enableLogTime(bool flag);
     std::string formatString(char* format, ...);
 
    
