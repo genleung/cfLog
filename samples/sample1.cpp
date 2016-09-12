@@ -21,7 +21,7 @@ int main(){
     const char *str="hello world";
        
     setLogLevel(LogLevel::INFO);
-    enableLogPosition(true);
+    enableLogPosition(true, true);
     setLogFile("test.txt", true);
     LOG()<<a<<":Hello!!!";
     setLogFile("log.txt", true);
