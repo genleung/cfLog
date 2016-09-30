@@ -7,11 +7,8 @@
 #pragma once
 #include <iostream>
 #include <memory>
-#include <pthread.h>
-#include <ctime>
 #include <mutex>
 #include <fstream>
-#include <iomanip>
 #include "LogStream.h"
 
 /// 以LogLevel::INFO等级调用单例Log对象.

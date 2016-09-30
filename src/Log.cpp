@@ -1,6 +1,8 @@
 #include "Log.h"
 #include <string>
 #include <cstdarg>
+#include <chrono>
+#include <iomanip>
 
 namespace art{
     //---------------------------------------------------------------------------
@@ -101,7 +103,13 @@ namespace art{
         ss<<levelStr[(int)curLevel];
 
         if(_timeEnabled){        
-            ss<<std::put_time(std::localtime(&now_c), "[%Y-%m-%d %T]");
+            tm* lt=localtime(&now_c); 
+            ss <<"["  <<lt->tm_year+1900<<"-"
+                      <<std::setw(2)<<std::setfill('0')<<lt->tm_mon<<"-"
+                      <<std::setw(2)<<std::setfill('0')<<lt->tm_mday<<" "
+                      <<std::setw(2)<<std::setfill('0')<<lt->tm_hour << ":" 
+                      <<std::setw(2)<<std::setfill('0')<<lt->tm_min << ":" 
+                      <<std::setw(2)<<std::setfill('0')<< lt->tm_sec << "]";  
         }
 
         if(_positionEnabled && srcFile.length()){
