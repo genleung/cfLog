@@ -95,7 +95,7 @@ namespace art{
     /// @param srcFile [IN] 当前进行log动作的文件
     /// @param srcLine [IN] 当前进行log动作的代码行
     LogStream Log::createLogStream(LogLevel curLevel, std::string srcFile, int srcLine){
-        const static char* levelStr[] = { "[I]", "[W]", "[E]", "[F]"};
+        const static char* levelStr[] = { "[I]", "[N]", "[W]", "[E]", "[F]"};
         std::stringstream ss;
         std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
         std::time_t now_c = std::chrono::system_clock::to_time_t(now - std::chrono::hours(24));
@@ -105,8 +105,8 @@ namespace art{
         if(_timeEnabled){        
             tm* lt=localtime(&now_c); 
             ss <<"["  <<lt->tm_year+1900<<"-"
-                      <<std::setw(2)<<std::setfill('0')<<lt->tm_mon<<"-"
-                      <<std::setw(2)<<std::setfill('0')<<lt->tm_mday<<" "
+                      <<std::setw(2)<<std::setfill('0')<<lt->tm_mon+1<<"-"
+                      <<std::setw(2)<<std::setfill('0')<<lt->tm_mday+1<<" "
                       <<std::setw(2)<<std::setfill('0')<<lt->tm_hour << ":" 
                       <<std::setw(2)<<std::setfill('0')<<lt->tm_min << ":" 
                       <<std::setw(2)<<std::setfill('0')<< lt->tm_sec << "]";  
