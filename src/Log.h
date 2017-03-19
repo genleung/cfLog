@@ -81,7 +81,7 @@ namespace art{
         // ------------------------------------------------------
 
         /// 获取全局唯一的Log对象的指针.
-        static std::shared_ptr<Log> instance(){
+        static std::shared_ptr<Log> & instance(){
             // 仅进行一次init()操作，基于线程安全考量
             pthread_once(&_ponce, &Log::init);
             return _ptr;
