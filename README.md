@@ -1,8 +1,8 @@
-# artLog
+# cfarLog
 A tiny, flexible and thread-safe C++ logger for developers
 
 ## Compile
-You can compile the artlog as a static link library or a dynamic link library, based on your preferences. The CMake tool is required to build the libraries using our CMakeLists.txt. The procedure is quit simple on Linux system:
+You can compile the cfarlog as a static link library or a dynamic link library, based on your preferences. The CMake tool is required to build the libraries using our CMakeLists.txt. The procedure is quit simple on Linux system:
 - mkdir build
 - cd build
 - cmake ..
@@ -11,13 +11,13 @@ You can compile the artlog as a static link library or a dynamic link library, b
 That's all, and you can find the samples in 'build/bin' directory, and the libraries are in 'build/lib' directory.
 
 ## Usage
-artLog is easy to use. Basically, it could be used in two styles:
-- art::LOG*() Macro style 
-- C++ object art::Log style
+cfarLog is easy to use. Basically, it could be used in two styles:
+- cfar::LOG*() Macro style 
+- C++ object cfar::Log style
 
 ## Samples
 
-    using namespace art;
+    using namespace cfar;
     ...
     
     int a=123;
@@ -39,7 +39,7 @@ artLog is easy to use. Basically, it could be used in two styles:
     LOGF("hello int:%d, char:%c, float:%f, string:%s", a, ch, f, str);
     DLOGLF(ERROR, "hello int:%d, char:%c, float:%f, string:%s", a, ch, f, str);
     
-    art::Log log;
+    cfar::Log log;
     log()<<"kaka";
     log(LogLevel::WARNING)<<"This is a warning";
     
