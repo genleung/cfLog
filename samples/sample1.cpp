@@ -2,7 +2,7 @@
 #include <thread>
 #include <string>
 
-using namespace art;
+using namespace cfar;
 using namespace std;
 
 void threadFunc(int id){
@@ -34,7 +34,7 @@ int main(){
     LOGF("hello int:%d, char:%c, float:%f, string:%s", a, ch, f, str);
     DLOGLF(ERROR, "hello int:%d, char:%c, float:%f, string:%s", a, ch, f, str);
 
-    art::Log log;
+    Log log;
     log()<<"kaka";
     log(LogLevel::WARNING)<<"This is a warning";
 
