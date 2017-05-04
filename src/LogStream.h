@@ -8,14 +8,14 @@
 #include <iostream>
 #include <sstream>
 
-namespace art{
+namespace cfar{
     /// 前向声明    
     enum class LogLevel;
     class Log;
 
     /// @class LogStream
     /// @brief Log对象使用的字符串流,用来接收'<<'操作符输入.
-    /// @warning 此类不应该被单独使用，仅能被Log类使用
+    /// @warning 此类不允许被单独使用，仅能被Log类使用
     class LogStream : public std::ostringstream{
         friend class Log;
     public:

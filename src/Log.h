@@ -12,9 +12,9 @@
 #include "LogStream.h"
 
 /// 以LogLevel::INFO等级调用单例Log对象.
-#define LOG() art::Log::instance()->createLogStream(art::LogLevel::INFO, __FILE__, __LINE__)
+#define LOG() cfar::Log::instance()->createLogStream(cfar::LogLevel::INFO, __FILE__, __LINE__)
 /// 以指定等级调用单例Log对象.
-#define LOGL(level) art::Log::instance()->createLogStream(art::LogLevel::level, __FILE__, __LINE__ )
+#define LOGL(level) cfar::Log::instance()->createLogStream(cfar::LogLevel::level, __FILE__, __LINE__ )
 /// 以LogLevel::INFO等级输出可变参数格式的log信息.
 #define LOGF(format, ...) LOG()<<formatString((char*)format,##__VA_ARGS__)
 /// 以指定等级输出可变参数格式的log信息.
@@ -39,7 +39,7 @@
     #define DLOGLF(level, format, ...) do{}while(0)
 #endif
 
-namespace art{
+namespace cfar{
 
     /// log的等级.
     enum class LogLevel:int{
@@ -56,7 +56,7 @@ namespace art{
     ///
     /// 主要特性如下：
     /// 1. 小巧灵活、快速、线程安全
-    /// 2. 支持4个Log等级: INFO, WARNING, ERROR, FATAL
+    /// 2. 支持5个Log等级: INFO, NOTICE, WARNING, ERROR, FATAL
     /// 3. 支持以LOG宏模式(单例模式)和C++对象模式调用
     /// 4. 支持C++的<<流式操作
     /// 5. 支持可变参数列表格式化输出
@@ -74,7 +74,7 @@ namespace art{
         /// 输出到指定文件.
         Log(std::string logFile, bool append=false);
         /// 析构函数. 主要负责清理缓冲、关闭文件
-        ~Log();
+        virtual ~Log();
 
         // ------------------------------------------------------
         // inline公共成员函数
@@ -82,7 +82,8 @@ namespace art{
 
         /// 获取全局唯一的Log对象的指针.
         static std::shared_ptr<Log> & instance(){
-            // 仅进行一次init()操作，基于线程安全考量
+            // 仅会进行一次init()操作，基于线程安全考量
+            // 若init()已经被调用过，再次调用instance()时，不会再调用init()
             pthread_once(&_ponce, &Log::init);
             return _ptr;
         }
@@ -92,7 +93,7 @@ namespace art{
         /// @return 返回LogStream对象
         /// @see LogLevel，LogStream
         LogStream operator()(LogLevel level=LogLevel::INFO){
-            return createLogStream(level, "",0);
+            return createLogStream(level, "", 0);
         }
 
         /// 创建LogStream对象.
@@ -106,24 +107,23 @@ namespace art{
         // 一般公共成员函数
         // ------------------------------------------------------
 
-        /// 取消往文件中写入log信息，改为默认的std::cout输出.
-        void setLogFile();
-        /// 往文件中写入log信息.
-        void setLogFile(std::string file, bool append=false);
+        /// 往文件中写入log信息。若file为空，则改为默认的std::cout输出
+        void setLogFile(std::string file="", bool append=false);
         /// 设置log的阈值等级.
         void setLogLevel(LogLevel level);
         /// 是否允许记录进行log的文件名和行号.
         void enableLogPosition(bool enabled, bool fullpathEnabled=false);
         /// 是否允许记录进行log的时间
         void enableLogTime(bool flag);
+        /// 遇到致命错误的处理例程；可以由继承类重载。
+        virtual void fatal();
 
     private:
         /// 禁止拷贝构造.
         Log(const Log&);
         /// 禁止赋值.
         Log& operator=(const Log&);
-        /// 终止进程.
-        void terminateProcess();
+       
         /// 实例化Log对象.
         static void init();
         /// 清理流缓冲，并关闭流文件.
@@ -157,8 +157,7 @@ namespace art{
     //---------------------------------------------------------------------------
 
     void setLogLevel(LogLevel level);
-    void setLogFile();
-    void setLogFile(std::string file, bool append=false);
+    void setLogFile(std::string file="", bool append=false);
     void enableLogPosition(bool enabled, bool fullpathEnabled);
     void enableLogTime(bool flag);
     std::string formatString(char* format, ...);

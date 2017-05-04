@@ -4,7 +4,7 @@
 #include <chrono>
 #include <iomanip>
 
-namespace art{
+namespace cfar{
     //---------------------------------------------------------------------------
     // 初始化静态数据成员
     //---------------------------------------------------------------------------
@@ -15,7 +15,7 @@ namespace art{
     /// 初始化为空指针
     std::shared_ptr<Log> Log::_ptr=nullptr;
     
-    /// 全局互斥量. 
+    /// 静态互斥量. 
     /// 互斥量主要用于保证多线程环境下切换输出文件、多个Log实例同时写log信息时的线程安全.    
     std::mutex Log::_mutex;
 
@@ -36,22 +36,18 @@ namespace art{
         cleanupStream();
     }
   
-   
-    void Log::setLogFile(){
-        // 加锁，防止此时有log信息写入
-        _mutex.lock();
-
-        cleanupStream();
-        _os=&std::cout;
-        
-        _mutex.unlock();
-    }
-    
     /// @param logFile [IN] 用以保存log信息的文件
     /// @param append [IN] 是否以追加模式保存
     void Log::setLogFile(std::string logFile, bool append){
         if(logFile.empty()){
-            _os=&std::cout;
+		    // 加锁，防止此时有log信息写入
+		    _mutex.lock();
+
+		    cleanupStream();
+		    _os=&std::cout;
+		    
+		    _mutex.unlock();
+		    
             return;
         }
 
@@ -149,7 +145,7 @@ namespace art{
     void Log::log(LogStream* ls){       
         if(ls==nullptr) return;
 
-        // log输出被抑制
+        // log输出受到_level限制。
         if(ls->curLevel<_level) return;
         
         // 写入log信息时上锁，基于两点考虑：
@@ -157,16 +153,16 @@ namespace art{
         // 2、防止写入时setLogFile()被调用
         _mutex.lock(); 
         (*_os)<<ls->str()<<std::endl;
-       
+        _mutex.unlock();        
+        
         // 如果是fatal log，则终结进程
         if(ls->curLevel==LogLevel::FATAL){
-            terminateProcess();
+            fatal();
         }
-        _mutex.unlock();        
     }
 
-    /// @todo 需要回调函数支持用户自定义退出机制
-    void Log::terminateProcess(){  
+    /// @todo 需要继承类支持用户自定义退出机制
+    void Log::fatal(){  
         exit(-1);
     }
 
@@ -176,10 +172,6 @@ namespace art{
     //---------------------------------------------------------------------------
     void setLogLevel(LogLevel level){
         Log::instance()->setLogLevel(level);
-    }
-
-    void setLogFile(){
-        Log::instance()->setLogFile();
     }
 
     void setLogFile(std::string file, bool append){
@@ -196,7 +188,7 @@ namespace art{
        
     /// 处理格式化可变参数的辅助函数
     std::string formatString(char *format, ...){
-        char buf[256]={0};
+        char buf[512]={0};
         
         va_list st;
         va_start(st, format);

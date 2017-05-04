@@ -1,6 +1,6 @@
 #include "LogStream.h"
 #include "Log.h"
-namespace art{
+namespace cfar{
 
     /// 该构造函数会把log前缀信息写入到串流中.
     LogStream::LogStream(Log* p, LogLevel l, std::string pre)
