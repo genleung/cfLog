@@ -2,7 +2,7 @@
 #include <thread>
 #include <string>
 
-using namespace cfar;
+using namespace cf::utils;
 using namespace std;
 
 void threadFunc(int id){
