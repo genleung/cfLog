@@ -1,23 +1,24 @@
-# cfarLog
+# cfLog
 A tiny, flexible and thread-safe C++ logger for developers
 
 ## Compile
-You can compile the cfarlog as a static link library or a dynamic link library, based on your preferences. The CMake tool is required to build the libraries using our CMakeLists.txt. The procedure is quit simple on Linux system:
+You can compile the cfLog as a static link library or a dynamic link library, based on your preferences. The CMake tool is required to build the libraries using our CMakeLists.txt. The procedure is quit simple on Linux system:
 - mkdir build
 - cd build
 - cmake ..
 - make
+- sudo make install
 
 That's all, and you can find the samples in 'build/bin' directory, and the libraries are in 'build/lib' directory.
 
 ## Usage
-cfarLog is easy to use. Basically, it could be used in two styles:
-- cfar::LOG*() Macro style 
-- C++ object cfar::Log style
+cfLog is easy to use. Basically, it could be used in two styles:
+- cf::utils::LOG*() Macro style 
+- C++ object cf::utils::Log style
 
 ## Samples
 
-    using namespace cfar;
+    using namespace cf::utils;
     ...
     
     int a=123;
@@ -39,7 +40,7 @@ cfarLog is easy to use. Basically, it could be used in two styles:
     LOGF("hello int:%d, char:%c, float:%f, string:%s", a, ch, f, str);
     DLOGLF(ERROR, "hello int:%d, char:%c, float:%f, string:%s", a, ch, f, str);
     
-    cfar::Log log;
+    Log log;
     log()<<"kaka";
     log(LogLevel::WARNING)<<"This is a warning";
     
