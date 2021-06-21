@@ -1,5 +1,5 @@
 /// @file LogStream.h
-/// @brief LogStreamç±»çš„å¤´æ–‡ä»¶
+/// @brief LogStreamÀàµÄÍ·ÎÄ¼ş
 /// @date 2016-09-09
 /// @author Genleung Lan
 /// @version 1.0
@@ -8,36 +8,37 @@
 #include <iostream>
 #include <sstream>
 
-namespace cf{
-    namespace utils{
-        /// å‰å‘å£°æ˜
+namespace cf {
+    namespace utils {
+        /// Ç°ÏòÉùÃ÷
         enum class LogLevel;
         class Log;
 
         /// @class LogStream
-        /// @brief Logå¯¹è±¡ä½¿ç”¨çš„å­—ç¬¦ä¸²æµ,ç”¨æ¥æ¥æ”¶'<<'æ“ä½œç¬¦è¾“å…¥.
-        /// @warning æ­¤ç±»ä¸å…è®¸è¢«å•ç‹¬ä½¿ç”¨ï¼Œä»…èƒ½è¢«Logç±»ä½¿ç”¨
-        class LogStream : public std::ostringstream{
-            friend class Log;
+        /// @brief Log¶ÔÏóÊ¹ÓÃµÄ×Ö·û´®Á÷,ÓÃÀ´½ÓÊÕ'<<'²Ù×÷·ûÊäÈë.
+        /// @warning ´ËÀà²»ÔÊĞí±»µ¥¶ÀÊ¹ÓÃ£¬½öÄÜ±»LogÀàÊ¹ÓÃ
+        class LogStream : public std::ostringstream {
         public:
             ~LogStream();
-        private:
-            /// æ„é€ å‡½æ•°.
-            /// @param pLog [IN] Logå¯¹è±¡æŒ‡é’ˆ
-            /// @param curLevel [IN] å½“å‰logä¿¡æ¯çš„Logç­‰çº§
-            /// @param prefix [IN] å½“å‰logä¿¡æ¯çš„å‰ç¼€å­—ä¸²ï¼Œå¦‚ç­‰çº§ã€ä½ç½®ã€æ—¶é—´ç­‰
-            /// @see LogLevel
+            //private:
+                /// ¹¹Ôìº¯Êı.
+                /// @param pLog [IN] Log¶ÔÏóÖ¸Õë
+                /// @param curLevel [IN] µ±Ç°logĞÅÏ¢µÄLogµÈ¼¶
+                /// @param prefix [IN] µ±Ç°logĞÅÏ¢µÄÇ°×º×Ö´®£¬ÈçµÈ¼¶¡¢Î»ÖÃ¡¢Ê±¼äµÈ
+                /// @see LogLevel
             LogStream(Log* pLog, LogLevel curLevel, std::string prefix);
 
-            /// LogStreamçš„æ‹·è´æ„é€ å‡½æ•°.
+            /// LogStreamµÄ¿½±´¹¹Ôìº¯Êı.
             LogStream(const LogStream& ls);
-        protected:
-            /// å½“å‰å¾…è®°å½•çš„logä¿¡æ¯çš„çº§åˆ«
+            //protected:
+                /// µ±Ç°´ı¼ÇÂ¼µÄlogĞÅÏ¢µÄ¼¶±ğ
             LogLevel curLevel;
-            /// Logå¯¹è±¡æŒ‡é’ˆ
+            /// Log¶ÔÏóÖ¸Õë
             Log* pLog;
-            /// logå‰ç¼€
+            /// logÇ°×º
             std::string prefix;
         };
+
     };
 };
+
