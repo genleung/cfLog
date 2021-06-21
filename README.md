@@ -1,8 +1,8 @@
 # cfLog
-A tiny, flexible and thread-safe C++ logger for developers
+A tiny, flexible, portable and thread-safe C++ logger for developers
 
 ## Compile
-You can compile the cfLog as a static link library or a dynamic link library, based on your preferences. The CMake tool is required to build the libraries using our CMakeLists.txt. The procedure is quit simple on Linux system:
+You can compile the cfLog as a static link library or a dynamic link library, based on your preferences. The CMake tool is required to build the libraries using our CMakeLists.txt. The procedure is quit simple on Linux & Mac system  (also easy with CMake-GUI on Windows system):
 - mkdir build
 - cd build
 - cmake ..
