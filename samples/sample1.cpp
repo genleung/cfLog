@@ -18,7 +18,7 @@ int main(){
     int a=123;
     char ch='a';
     float f=1.234;
-    const char *str="hello world";
+    const char *str="世界你好！";
        
     setLogLevel(LogLevel::INFO);
     enableLogPosition(true, true);
@@ -36,7 +36,7 @@ int main(){
 
     Log log;
     log()<<"kaka";
-    log(LogLevel::WARNING)<<"This is a warning";
+    log(LogLevel::WARNING)<<"This is a warning这是一个警告";
 
     DLOGF("dummy format string");
     std::string str2="string test";

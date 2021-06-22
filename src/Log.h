@@ -29,8 +29,8 @@ namespace cf {
         /// 通过定义NDEBUG可以切换Log是否显示；若已经定义NDEBUG，则DLOG*系列宏并不输出log信息.
         /// Windows下 VisualStudio Debug模式未定义NDEBUG，Release模式则定义了NDEBUG; 
         /// Linux下可以通过-DNDEBUG参数传入到g++
-        ///
-        #ifdef NDEBUG
+        /// 
+        #ifndef DEBUG_MODE
             /// Debug模式下，以LogLevel::INFO等级调用单例Log对象
             #define DLOG(msg) Log::instance()->createLogStream(cf::utils::LogLevel::INFO, __FILE__, __LINE__) << msg
             /// Debug模式下，以指定等级调用单例Log对象
