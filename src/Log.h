@@ -30,7 +30,7 @@ namespace cf {
         /// Windows下 VisualStudio Debug模式未定义NDEBUG，Release模式则定义了NDEBUG; 
         /// Linux下可以通过-DNDEBUG参数传入到g++
         /// 
-        #ifndef DEBUG_MODE
+        #ifndef NDEBUG
             /// Debug模式下，以LogLevel::INFO等级调用单例Log对象
             #define DLOG(msg) Log::instance()->createLogStream(cf::utils::LogLevel::INFO, __FILE__, __LINE__) << msg
             /// Debug模式下，以指定等级调用单例Log对象
