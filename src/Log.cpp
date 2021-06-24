@@ -102,7 +102,7 @@ namespace cf {
 
             if (_timeEnabled) {
                 tm t;
-#if defined(__WIN32) || defined(__WIN64)
+#if defined(_WIN32) || defined(_WIN64)
                 localtime_s(&t, &now_c);
 #else
                 localtime_r(&now_c, &t);
