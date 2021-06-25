@@ -1,3 +1,4 @@
+#define TRACE_ENABLED
 #include "Log.h"
 #include <thread>
 #include <string>

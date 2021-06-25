@@ -18,9 +18,10 @@ namespace cf {
         /// @brief Log对象使用的字符串流,用来接收'<<'操作符输入.
         /// @warning 此类不允许被单独使用，仅能被Log类使用
         class LogStream : public std::ostringstream {
+            friend class Log;
         public:
             ~LogStream();
-            //private:
+        private:
                 /// 构造函数.
                 /// @param pLog [IN] Log对象指针
                 /// @param curLevel [IN] 当前log信息的Log等级
@@ -30,7 +31,7 @@ namespace cf {
 
             /// LogStream的拷贝构造函数.
             LogStream(const LogStream& ls);
-            //protected:
+        protected:
                 /// 当前待记录的log信息的级别
             LogLevel curLevel;
             /// Log对象指针

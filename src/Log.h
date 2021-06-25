@@ -26,18 +26,16 @@ namespace cf {
 
 
         ///
-        /// 通过定义NDEBUG可以切换Log是否显示；若已经定义NDEBUG，则DLOG*系列宏并不输出log信息.
-        /// Windows下 VisualStudio Debug模式未定义NDEBUG，Release模式则定义了NDEBUG; 
-        /// 可以通过CMAKE_BUILD_TYPE参数（如cmake -DCMAKE_BUILD_TYPE=Release/Debug .. ）实现NDEBUG开关
+        /// 通过定义TRACE_ENABLED可以切换Log是否显示；若未定义TRACE_ENABLED，则DLOG*系列宏并不输出log信息.
         /// 
-        #ifndef NDEBUG
-            /// Debug模式下，以LogLevel::INFO等级调用单例Log对象
+        #ifdef TRACE_ENABLED
+            /// LogLevel::INFO等级调用单例Log对象
             #define DLOG(msg) Log::instance()->createLogStream(cf::utils::LogLevel::INFO, __FILE__, __LINE__) << msg
-            /// Debug模式下，以指定等级调用单例Log对象
+            /// 以指定等级调用单例Log对象
             #define DLOGL(level, msg) Log::instance()->createLogStream(cf::utils::LogLevel::level, __FILE__, __LINE__ ) << msg
-            /// Debug模式下，以LogLevel::INFO等级输出可变参数格式的log信息
+            /// 以LogLevel::INFO等级输出可变参数格式的log信息
             #define DLOGF(format, ...) Log::instance()->createLogStream(cf::utils::LogLevel::INFO, __FILE__, __LINE__) << Log::formatString( (char*)format, ##__VA_ARGS__ )
-            /// Debug模式下，以指定等级输出可变参数格式的log信息
+            /// 以指定等级输出可变参数格式的log信息
             #define DLOGLF(level, format, ...) Log::instance()->createLogStream(cf::utils::LogLevel::level, __FILE__, __LINE__ ) << Log::formatString((char*)format,##__VA_ARGS__)
         #else
             #define DLOG(msg) do{}while(0)
@@ -45,7 +43,6 @@ namespace cf {
             #define DLOGF(format, ...) do{}while(0)
             #define DLOGLF(level, format, ...) do{}while(0)
         #endif
-
 
         /// log的等级.
         enum class LogLevel :int {
@@ -88,7 +85,7 @@ namespace cf {
             /// 获取全局唯一的Log对象的指针.
             static std::shared_ptr<Log>& instance() {
                 // 仅会进行一次new操作，基于线程安全考量
-                std::call_once(_ponce, [&]() { _ptr = std::shared_ptr<Log>(new Log()); });
+                std::call_once(_ponce, [&]() { _ptr = std::make_shared<Log>(); });
                 return _ptr;
             }
 
