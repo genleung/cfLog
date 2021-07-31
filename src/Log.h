@@ -130,7 +130,8 @@ namespace cf
              * 
              * @param[in] level 指定Log等级
              * @return 返回LogStream对象
-             * @sa  LogLevel，LogStream
+             * @see  cf::utils::LogLevel
+             * @sa cf::utils::LogStream
              */
             LogStream operator()(LogLevel level = LogLevel::INFO)
             {
@@ -145,6 +146,7 @@ namespace cf
              * @param[in] srcFile 当前的log文件
              * @param[in] srcLine 当前进行log动作的代码行
              * @return LogStream 创建好的LogStream流对象
+             * @see cf::utils::LogStream
              */
             LogStream createLogStream(LogLevel curLevel, std::string srcFile = "", int srcLine = -1);
 
@@ -160,7 +162,7 @@ namespace cf
              * @brief 设置log的阈值等级.
              * 
              * @param[in] level Log阈值
-             * @sa LogLevel
+             * @see cf::utils::LogLevel
              */
             void setLogLevel(LogLevel level);
 
@@ -229,23 +231,41 @@ namespace cf
             void log(LogStream *ls);
 
         private:
-            static std::once_flag _ponce;          ///< pthread唯一次初始化对象标记.
-            static std::shared_ptr<Log> _ptr;      ///< 唯一的Log实例指针.
             LogLevel _level = LogLevel::INFO;      ///< Log阈值，当log动作对应的log等级必须大于或等于Log阈值，log信息才会被记录下来.
             bool _positionEnabled = true;          ///< 是否允许显示log位置.
             bool _positionFullpathEnabled = false; ///< 是否记录完整的文件名路径(此开关在_positionEanbled被启用的前提下有效)
             bool _timeEnabled = true;              ///< 是否允许显示log时间
             std::ostream *_os = nullptr;           ///< Log输出流.
             std::ofstream _ofs;                    ///< Log文件对象
-            static std::mutex _mutex;              ///< 互斥量，用以确保log输出不被打断.
+
+        private:
+            /**
+             * @brief 唯一次初始化对象标记. 
+             * @details 用于std::call_once.
+             * 
+             */
+            static std::once_flag _ponce; 
+
+            /**
+             * @brief 单例模式下的唯一的Log实例指针.
+             * @detials 若使用对象(多实例)模式，这个指针可以忽略之
+             * 
+             */
+            static std::shared_ptr<Log> _ptr;
+
+            /** 
+             * @brief 确保log时线程安全的互斥量.
+             * @details 保证多线程环境下切换输出文件、多个Log实例同时写同一个log文件的操作完整性（不被打断）
+             */
+            static std::mutex _mutex;
         };
 
         /**
          * @brief 设置log的阈值等级.
          * 
          * @param[in] level Log阈值
-         * @attention 该全局函数调用单例模式Log
-         * @sa Log::setLogLevel
+         * @attention 该全局函数用于单例模式Log
+         * @see cf::utils::Log::setLogLevel()
          */
         void setLogLevel(LogLevel level);
 
@@ -254,7 +274,8 @@ namespace cf
          * 
          * @param[in] file 指定的log文件 
          * @param[in] append 是否以追加模式写入到log文件中 
-         * @sa Log::setLogFile()
+         * @attention 该全局函数用于单例模式Log
+         * @see cf::utils::Log::setLogFile()
          */
         void setLogFile(std::string file = "", bool append = true);
 
@@ -262,8 +283,9 @@ namespace cf
          * @brief 是否允许记录进行log的文件名和行号.
          * 
          * @param[in] enabled 允许在log中记录进行log动作的文件名
-         * @param[in] showFullpath 是否显示文件名的全路径\
-         * @sa Log::enableLogPosition()
+         * @param[in] showFullpath 是否显示文件名的全路径
+         * @attention 该全局函数用于单例模式Log
+         * @see cf::utils::Log::enableLogPosition()
          */
         void enableLogPosition(bool enabled, bool showFullpath);
 
@@ -271,7 +293,8 @@ namespace cf
          * @brief 是否允许记录进行log的时间
          * 
          * @param timeLogged true:记录log时间; false:不记录log时间 
-         * @sa Log::enableLogTime
+         * @attention 该全局函数用于单例模式Log
+         * @see cf::utils::Log::enableLogTime()
          */
         void enableLogTime(bool timeLogged);
     };
