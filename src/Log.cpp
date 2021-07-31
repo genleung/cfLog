@@ -95,13 +95,12 @@ namespace cf {
         LogStream Log::createLogStream(LogLevel curLevel, std::string srcFile, int srcLine) {
             const static char* levelStr[] = { "[I]", "[N]", "[W]", "[E]", "[F]" };
             std::stringstream ss;
-            std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
-            std::time_t now_c = std::chrono::system_clock::to_time_t(now - std::chrono::hours(24));
+            std::time_t now_c = std::time(0);
 
             ss << levelStr[(int)curLevel];
 
             if (_timeEnabled) {
-                tm t;
+                std::tm t;
 #if defined(_WIN32) || defined(_WIN64)
                 localtime_s(&t, &now_c);
 #else
@@ -154,7 +153,7 @@ namespace cf {
             if (ls == nullptr) return;
 
             // log输出受到_level限制。
-            if (ls->curLevel < _level) return;
+            if (ls->_curLevel < _level) return;
 
             // 写入log信息时上锁，基于两点考虑：
             // 1、防止线程间写入彼此干扰
@@ -164,7 +163,7 @@ namespace cf {
             _mutex.unlock();
 
             // 如果是fatal log，则终结进程
-            if (ls->curLevel == LogLevel::FATAL) {
+            if (ls->_curLevel == LogLevel::FATAL) {
                 fatal();
             }
         }

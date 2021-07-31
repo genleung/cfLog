@@ -1,8 +1,13 @@
-/// @file LogStream.h
-/// @brief LogStreamÀàµÄÍ·ÎÄ¼ş
-/// @date 2016-09-09
-/// @author Genleung Lan
-/// @version 1.0
+/**
+ * @file LogStream.h
+ * @author Genleung Lan(genleung@hotmail.com)
+ * @brief 
+ * @version 0.1
+ * @date 2021-07-31
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
 
 #pragma once
 #include <iostream>
@@ -10,34 +15,43 @@
 
 namespace cf {
     namespace utils {
-        /// Ç°ÏòÉùÃ÷
         enum class LogLevel;
-        class Log;
-
-        /// @class LogStream
-        /// @brief Log¶ÔÏóÊ¹ÓÃµÄ×Ö·û´®Á÷,ÓÃÀ´½ÓÊÕ'<<'²Ù×÷·ûÊäÈë.
-        /// @warning ´ËÀà²»ÔÊĞí±»µ¥¶ÀÊ¹ÓÃ£¬½öÄÜ±»LogÀàÊ¹ÓÃ
+        class Log;        
+        /**
+         * @class LogStream
+         * @brief Logå¯¹è±¡ä½¿ç”¨çš„å­—ç¬¦ä¸²åˆ˜ï¼Œç”¨æ¥æ¥æ”¶"<<"æ“ä½œç¬¦è¾“å…¥.
+         * @warning æ­¤ç±»ä¸å…è®¸è¢«å•ç‹¬ä½¿ç”¨ï¼Œä»…èƒ½è¢«Logç±»ä½¿ç”¨
+         */
         class LogStream : public std::ostringstream {
             friend class Log;
         public:
+            /**
+             * @brief Destroy the Log Stream object
+             * @details  å®ä¾‹é”€æ¯æ—¶ï¼Œææ„å‡½æ•°å³è¾“å‡ºlogä¿¡æ¯. è¿™ç§åœ¨ææ„å‡½æ•°æ‰§è¡Œæ—¶ï¼Œä¸€æ¬¡æ€§è¾“å‡ºå…¨éƒ¨logä¿¡æ¯çš„åšæ³•ï¼Œä¾èµ–äºGccçš„RVOæ”¯æŒ
+             */
             ~LogStream();
-        private:
-                /// ¹¹Ôìº¯Êı.
-                /// @param pLog [IN] Log¶ÔÏóÖ¸Õë
-                /// @param curLevel [IN] µ±Ç°logĞÅÏ¢µÄLogµÈ¼¶
-                /// @param prefix [IN] µ±Ç°logĞÅÏ¢µÄÇ°×º×Ö´®£¬ÈçµÈ¼¶¡¢Î»ÖÃ¡¢Ê±¼äµÈ
-                /// @see LogLevel
+
+        private:               
+            /**
+             * @brief æ„é€ å‡½æ•°
+             * 
+             * @param pLog [in] pLog Logå¯¹è±¡æŒ‡é’ˆ
+             * @param curLevel [in] curLevel å½“å‰Logä¿¡æ¯çš„Logç­‰çº§
+             * @param prefix [in] prefix å½“å‰Logä¿¡æ¯çš„å‰ç¼€å­—ç¬¦ä¸²ï¼Œå¦‚ç­‰çº§ã€ä½ç½®ã€æ—¶é—´ç­‰
+             * @see LogLevel
+             */
             LogStream(Log* pLog, LogLevel curLevel, std::string prefix);
 
-            /// LogStreamµÄ¿½±´¹¹Ôìº¯Êı.
+            /**
+             * @brief LogStreamæ‹·è´æ„é€ å‡½æ•°
+             * @attention Gccåœ¨RVO(è¿”å›å€¼ä¼˜åŒ–)è¢«å¯ç”¨æ—¶ï¼Œè¯¥æ‹·è´æ„é€ å‡½æ•°ä¸ä¼šè¢«ç”¨ä¸Š
+             */
             LogStream(const LogStream& ls);
+
         protected:
-                /// µ±Ç°´ı¼ÇÂ¼µÄlogĞÅÏ¢µÄ¼¶±ğ
-            LogLevel curLevel;
-            /// Log¶ÔÏóÖ¸Õë
-            Log* pLog;
-            /// logÇ°×º
-            std::string prefix;
+            LogLevel _curLevel;  ///< å½“å‰å¾…è®°å½•çš„Logç­‰çº§
+            Log* _pLog;          ///< LogæŒ‡é’ˆ
+            std::string _prefix; ///< Logå‰ç¼€
         };
 
     };
