@@ -26,8 +26,6 @@ namespace cf {
         Log::Log() :_os(&std::cout) {
         }
 
-        ///@param logFile [IN] 用以保存log信息的文件
-        ///@param append [IN] 是否以追加模式保存
         Log::Log(std::string logFile, bool append) {
             setLogFile(logFile, append);
         }
@@ -36,8 +34,7 @@ namespace cf {
             cleanupStream();
         }
 
-        /// @param logFile [IN] 用以保存log信息的文件
-        /// @param append [IN] 是否以追加模式保存
+
         void Log::setLogFile(std::string logFile, bool append) {
             if (logFile.empty()) {
                 // 加锁，防止此时有log信息写入
@@ -72,8 +69,7 @@ namespace cf {
             _mutex.unlock();
         }
 
-        /// 设定Log阈值. 当log动作对应的log等级必须大于或等于Log阈值，log信息才会被记录下来.
-        /// @param level [IN] Log阈值
+
         void Log::setLogLevel(LogLevel level) {
             _level = level;
         }
@@ -87,11 +83,6 @@ namespace cf {
             _timeEnabled = flag;
         }
 
-        /// 创建LogStream对象.
-        /// 首先把当前的log等级、log位置、log时间写入到LogStream对象中，再返回此对象
-        /// @param curLevel [IN] 当前的log等级
-        /// @param srcFile [IN] 当前进行log动作的文件
-        /// @param srcLine [IN] 当前进行log动作的代码行
         LogStream Log::createLogStream(LogLevel curLevel, std::string srcFile, int srcLine) {
             const static char* levelStr[] = { "[I]", "[N]", "[W]", "[E]", "[F]" };
             std::stringstream ss;
@@ -135,11 +126,6 @@ namespace cf {
             return LogStream(this, curLevel, ss.str());
         }
 
-        //---------------------------------------------------------------------------
-        // 私有成员函数
-        //---------------------------------------------------------------------------
-
-        /// 首先输出流内的数据，然后检查并关闭打开的文件.
         void Log::cleanupStream() {
             if (_os) _os->flush();
             if (_ofs.is_open()) {
@@ -168,12 +154,12 @@ namespace cf {
             }
         }
 
-        /// @todo 需要继承类支持用户自定义退出机制
+
         void Log::fatal() {
             exit(-1);
         }
 
-        /// 处理格式化可变参数的辅助函数
+
         std::string Log::formatString(char* format, ...) {
             char buf[512] = { 0 };
 
@@ -192,9 +178,6 @@ namespace cf {
             return str;
         }
 
-        //---------------------------------------------------------------------------
-        // 全局函数，为方便使用
-        //---------------------------------------------------------------------------
         void setLogLevel(LogLevel level) {
             Log::instance()->setLogLevel(level);
         }
