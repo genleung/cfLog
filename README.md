@@ -13,8 +13,8 @@ That's all, and you can find the samples in 'build/bin' directory, and the libra
 
 ## Usage
 cfLog is easy to use. Basically, it could be used in two styles:
-- cf::utils::LOG*() Macro style 
-- C++ object cf::utils::Log style
+- cf::utils::LOG*() Singleto macro mode (单实例宏模式)
+- C++ object cf::utils::Log Multi-instances class-object mode(多实例类对象模式)
 
 ## Samples
 
@@ -45,3 +45,9 @@ cfLog is easy to use. Basically, it could be used in two styles:
     log(LogLevel::WARNING)<<"This is a warning";
     
     DLOGF("dummy format string");
+
+
+## Documents
+cfLog uses doxygen to generate the source document. It is easy with doxygen:
+    doxygen Doxyfile
+    
