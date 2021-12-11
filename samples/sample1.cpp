@@ -1,4 +1,5 @@
 #define TRACE_ENABLED
+#define LOG_TAG "test"
 #include "Log.h"
 #include <thread>
 #include <string>
@@ -8,7 +9,7 @@ using namespace std;
 
 void threadFunc(int id){
     setLogFile("threads.txt", true);
-    LOG()<<"DD in thread "<<id;
+    LOGI("DD in thread")<<id;
 
     Log log;
     log.setLogFile("threads.txt", true);
@@ -24,24 +25,25 @@ int main(){
     setLogLevel(LogLevel::INFO);
     enableLogPosition(true, true);
     setLogFile("test.txt", true);
-    LOG()<<a<<":Hello!!!";
+
+    LOGI("A")<<a<<":Hello!!!";
     setLogFile("log.txt", true);
-    DLOG("world!");
-    LOGL(ERROR)<<"error!";
+    TRACEI("world!");
+    LOGE("")<<"error!";
     setLogFile();
-    LOGL(WARNING)<<"warning...";
-    DLOGL(ERROR, "debug error");
+    LOGW("warn...");
+    TRACEE("debug error");
     
-    LOGF("hello int:%d, char:%c, float:%f, string:%s", a, ch, f, str);
-    DLOGLF(ERROR, "hello int:%d, char:%c, float:%f, string:%s", a, ch, f, str);
+    LOGI("hello int:%d, char:%c, float:%f, string:%s", a, ch, f, str);
+    TRACEFF("hello int:%d, char:%c, float:%f, string:%s", a, ch, f, str);
 
     Log log;
     log()<<"kaka";
-    log(LogLevel::WARNING)<<"This is a warning这是一个警告";
+    log(LogLevel::INFO, "warningTag")<<"This is a warn";
 
-    DLOGF("dummy format string");
+    TRACEF("dummy format string");
     std::string str2="string test";
-    DLOGF("where is the string:%s", str2.c_str());
+    TRACEF("where is the string:%s", str2.c_str());
    
    
     // 多线程测试
