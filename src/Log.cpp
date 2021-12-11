@@ -3,6 +3,7 @@
 #include <cstdarg>
 #include <chrono>
 #include <iomanip>
+#include <exception>
 
 namespace cf
 {
@@ -83,13 +84,16 @@ namespace cf
             _timeEnabled = flag;
         }
 
-        LogStream Log::createLogStream(LogLevel curLevel, std::string srcFile, int srcLine)
+        LogStream Log::createLogStream(LogLevel curLevel, std::string tagString, std::string srcFile, int srcLine)
         {
             const static char *levelStr[] = {"[I]", "[N]", "[W]", "[E]", "[F]"};
             std::stringstream ss;
             std::time_t now_c = std::time(0);
 
             ss << levelStr[(int)curLevel];
+            if(tagString.length()){
+                ss << "[" << tagString << "]";
+            }
 
             if (_timeEnabled)
             {
@@ -165,16 +169,37 @@ namespace cf
             // 如果是fatal log，则终结进程
             if (ls->_curLevel == LogLevel::FATAL)
             {
+                std::cerr<<"[F] Fatal error occured!"<<std::endl;
                 fatal();
             }
         }
 
         void Log::fatal()
         {
-            exit(-1);
+            throw "Fatal error occured.";
         }
 
         std::string Log::formatString(char *format, ...)
+        {
+            char buf[512] = {0};
+
+            va_list st;
+            va_start(st, format);
+            int nw = vsnprintf(buf, sizeof(buf), format, st);
+            va_end(st);
+
+            std::string str(buf);
+            if (nw >= sizeof(buf))
+            {
+                // buf太小，导致log信息被截断了
+                // TODO: 增大buf的固定大小，或者其他机制。
+                str += " ... ";
+            }
+
+            return str;
+        }
+
+        std::string Log::formatString(const char *format, ...)
         {
             char buf[512] = {0};
 

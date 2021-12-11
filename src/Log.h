@@ -21,45 +21,69 @@ namespace cf
     namespace utils
     {
 
-/// 以LogLevel::INFO等级调用单例Log对象.
-#define LOG() Log::instance()->createLogStream(cf::utils::LogLevel::INFO)
-/// 以指定等级调用单例Log对象.
-#define LOGL(level) Log::instance()->createLogStream(cf::utils::LogLevel::level)
-/// 以LogLevel::INFO等级输出可变参数格式的log信息.
-#define LOGF(format, ...) Log::instance()->createLogStream(cf::utils::LogLevel::INFO) << Log::formatString((char *)format, ##__VA_ARGS__)
-/// 以指定等级输出可变参数格式的log信息.
-#define LOGLF(level, format, ...) Log::instance()->createLogStream(cf::utils::LogLevel::level) << Log::formatString((char *)format, ##__VA_ARGS__)
+        /// 定义Log标签
+        #ifndef LOG_TAG
+        #define LOG_TAG ""
+        #endif
 
-///
-/// 通过定义TRACE_ENABLED可以切换Log是否显示；若未定义TRACE_ENABLED，则DLOG*系列宏并不输出log信息.
-///
-#ifdef TRACE_ENABLED
-/// LogLevel::INFO等级调用单例Log对象
-#define DLOG(msg) Log::instance()->createLogStream(cf::utils::LogLevel::INFO, __FILE__, __LINE__) << msg
-/// 以指定等级调用单例Log对象
-#define DLOGL(level, msg) Log::instance()->createLogStream(cf::utils::LogLevel::level, __FILE__, __LINE__) << msg
-/// 以LogLevel::INFO等级输出可变参数格式的log信息
-#define DLOGF(format, ...) Log::instance()->createLogStream(cf::utils::LogLevel::INFO, __FILE__, __LINE__) << Log::formatString((char *)format, ##__VA_ARGS__)
-/// 以指定等级输出可变参数格式的log信息
-#define DLOGLF(level, format, ...) Log::instance()->createLogStream(cf::utils::LogLevel::level, __FILE__, __LINE__) << Log::formatString((char *)format, ##__VA_ARGS__)
-#else
-#define DLOG(msg) \
-    do            \
-    {             \
-    } while (0)
-#define DLOGL(level, msg) \
-    do                    \
-    {                     \
-    } while (0)
-#define DLOGF(format, ...) \
-    do                     \
-    {                      \
-    } while (0)
-#define DLOGLF(level, format, ...) \
-    do                             \
-    {                              \
-    } while (0)
-#endif
+        #ifdef __ANDROID__  // using Android log
+            #include <android/log.h>
+            #define LOG(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
+            #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
+            #define LOGW(...) __android_log_print(ANDROID_LOG_WARN, LOG_TAG, __VA_ARGS__)
+            #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+            #define LOGF(...) __android_log_print(ANDROID_LOG_FATAL, LOG_TAG, __VA_ARGS__)
+            #ifdef TRACE_ENABLED
+                #define TRACE(msg) LOGI(" %s(%d)::%s: %s", __FILE__, __LINE__, __FUNCTION__, msg)
+                #define TRACEI(msg) LOGI(" %s(%d)::%s: %s", __FILE__, __LINE__, __FUNCTION__, msg)
+                #define TRACEW(msg) LOGW(" %s(%d)::%s: %s", __FILE__, __LINE__, __FUNCTION__, msg)
+                #define TRACEE(msg) LOGE(" %s(%d)::%s: %s", __FILE__, __LINE__, __FUNCTION__, msg)
+                #define TRACEF(msg) LOGF(" %s(%d)::%s: %s", __FILE__, __LINE__, __FUNCTION__, msg)
+                #define TRACEIF(format, ...) LOGI(" %s(%d)::%s: " # format, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__)
+                #define TRACEWF(format, ...) LOGW(" %s(%d)::%s: " # format, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__)
+                #define TRACEEF(format, ...) LOGE(" %s(%d)::%s: " # format, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__)
+                #define TRACEFF(format, ...) LOGF(" %s(%d)::%s: " # format, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__)
+            #else
+                #define TRACE(msg) (static_cast<void>(0))
+                #define TRACEI(msg) (static_cast<void>(0))
+                #define TRACEW(msg) (static_cast<void>(0))
+                #define TRACEE(msg) (static_cast<void>(0))
+                #define TRACEF(msg) (static_cast<void>(0))
+                #define TRACEIF(format, ...) (static_cast<void>(0))
+                #define TRACEWF(format, ...) (static_cast<void>(0))
+                #define TRACEEF(format, ...) (static_cast<void>(0))
+                #define TRACEFF(format, ...) (static_cast<void>(0))
+            #endif
+        #else   // using standard C++ (Linux/Windows/MacOS)
+            #define LOGL(level) Log::instance()->createLogStream(LogLevel::level, LOG_TAG)
+            #define LOG(...) LOGL(INFO) << Log::formatString(__VA_ARGS__)
+            #define LOGI(...) LOGL(INFO) << Log::formatString(__VA_ARGS__)
+            #define LOGW(...) LOGL(WARN) << Log::formatString(__VA_ARGS__)
+            #define LOGE(...) LOGL(ERROR) << Log::formatString(__VA_ARGS__)
+            #define LOGF(...) LOGL(FATAL) << Log::formatString(__VA_ARGS__)
+            #ifdef TRACE_ENABLED
+                #define TRACEL(level) Log::instance()->createLogStream(LogLevel::level, LOG_TAG, __FILE__, __LINE__)
+                #define TRACE(...) TRACEL(INFO) << Log::formatString(__VA_ARGS__)
+                #define TRACEI(...) TRACEL(INFO) << Log::formatString(__VA_ARGS__)
+                #define TRACEW(...) TRACEL(WARN) << Log::formatString(__VA_ARGS__)
+                #define TRACEE(...) TRACEL(ERROR) << Log::formatString(__VA_ARGS__)
+                #define TRACEF(...) TRACEL(FATAL) << Log::formatString(__VA_ARGS__)
+                #define TRACEIF(...) TRACEI(__VA_ARGS__)
+                #define TRACEWF(...) TRACEW(__VA_ARGS__)
+                #define TRACEEF(...) TRACEE(__VA_ARGS__)
+                #define TRACEFF(...) TRACEF(__VA_ARGS__)
+            #else
+                #define TRACE(msg) (static_cast<void>(0))
+                #define TRACEI(msg) (static_cast<void>(0))
+                #define TRACEW(msg) (static_cast<void>(0))
+                #define TRACEE(msg) (static_cast<void>(0))
+                #define TRACEF(msg) (static_cast<void>(0))
+                #define TRACEIF(format, ...) (static_cast<void>(0))
+                #define TRACEWF(format, ...) (static_cast<void>(0))
+                #define TRACEEF(format, ...) (static_cast<void>(0))
+                #define TRACEFF(format, ...) (static_cast<void>(0))
+            #endif 
+        #endif  
 
         /**
          * @brief log的等级.
@@ -69,7 +93,7 @@ namespace cf
         {
             INFO = 0, ///< 信息
             NOTICE,   ///< 提示
-            WARNING,  ///< 警告
+            WARN,     ///< 警告
             ERROR,    ///< 一般错误
             FATAL     ///< 致命错误(将导致进程退出)
         };
@@ -78,7 +102,7 @@ namespace cf
          * @class cf::utils::Log
          * @details 一个小巧灵活、线程安全的Log工具;主要特性如下：
          * 1. 小巧灵活、快速、线程安全
-         * 2. 支持5个Log等级: INFO, NOTICE, WARNING, ERROR, FATAL
+         * 2. 支持5个Log等级: INFO, NOTICE, WARN, ERROR, FATAL
          * 3. 支持以LOG宏模式(单例模式)和 C++多实例模式调用
          * 4. 支持C++的<<流式操作
          * 5. 支持可变参数列表格式化输出
@@ -133,9 +157,10 @@ namespace cf
              * @see  cf::utils::LogLevel
              * @sa cf::utils::LogStream
              */
-            LogStream operator()(LogLevel level = LogLevel::INFO)
+            LogStream operator()(LogLevel level = LogLevel::INFO, std::string logTag=LOG_TAG)
             {
-                return createLogStream(level, "", 0);
+                _tag = logTag;
+                return createLogStream(level, _tag, "", 0);
             }
 
             /**
@@ -143,12 +168,13 @@ namespace cf
              * @details 首先把当前的log等级、log位置、log时间写入到LogStream对象中，再返回此对象
              * 
              * @param[in] curLevel 当前的log等级
+             * @param[in] tagString TAG字符串
              * @param[in] srcFile 当前的log文件
              * @param[in] srcLine 当前进行log动作的代码行
              * @return LogStream 创建好的LogStream流对象
              * @see cf::utils::LogStream
              */
-            LogStream createLogStream(LogLevel curLevel, std::string srcFile = "", int srcLine = -1);
+            LogStream createLogStream(LogLevel curLevel, std::string tagString="", std::string srcFile = "", int srcLine = -1);
 
             /**
              * @brief 设定log文件及写入模式。若file为空，则改为默认的std::cout输出
@@ -197,6 +223,15 @@ namespace cf
              */
             static std::string formatString(char *format, ...);
 
+            /**
+             * @brief 格式化字符串
+             * 
+             * @param[in] format 字符串描述符
+             * @param[in] ... 可变长的参数列表
+             * @return std::string 格式化好后的字符串
+             */
+            static std::string formatString(const char *format, ...);
+
         private:
             /**
              * @brief 禁止拷贝构造.
@@ -231,6 +266,7 @@ namespace cf
             void log(LogStream *ls);
 
         private:
+            std::string _tag = LOG_TAG;            ///< Log Tag
             LogLevel _level = LogLevel::INFO;      ///< Log阈值，当log动作对应的log等级必须大于或等于Log阈值，log信息才会被记录下来.
             bool _positionEnabled = true;          ///< 是否允许显示log位置.
             bool _positionFullpathEnabled = false; ///< 是否记录完整的文件名路径(此开关在_positionEanbled被启用的前提下有效)
