@@ -24,27 +24,30 @@ cfLog is easy to use. Basically, it could be used in two styles:
     int a=123;
     char ch='a';
     float f=1.234;
-    const char *str="hello world";
-    
+    const char *str="世界你好！";
+       
     setLogLevel(LogLevel::INFO);
-    enableLogPosition(true);
+    enableLogPosition(true, true);
     setLogFile("test.txt", true);
-    LOG()<<a<<":Hello!!!";
+
+    LOGI("A")<<a<<":Hello!!!";
     setLogFile("log.txt", true);
-    DLOG("world!");
-    LOGL(ERROR)<<"error!";
+    TRACEI("world!");
+    LOGE("")<<"error!";
     setLogFile();
-    LOGL(WARNING)<<"warning...";
-    DLOGL(ERROR, "debug error");
+    LOGW("warn...");
+    TRACEE("debug error");
     
-    LOGF("hello int:%d, char:%c, float:%f, string:%s", a, ch, f, str);
-    DLOGLF(ERROR, "hello int:%d, char:%c, float:%f, string:%s", a, ch, f, str);
-    
+    LOGI("hello int:%d, char:%c, float:%f, string:%s", a, ch, f, str);
+    TRACEFF("hello int:%d, char:%c, float:%f, string:%s", a, ch, f, str);
+
     Log log;
     log()<<"kaka";
-    log(LogLevel::WARNING)<<"This is a warning";
-    
-    DLOGF("dummy format string");
+    log(LogLevel::INFO, "warningTag")<<"This is a warn";
+
+    TRACEF("dummy format string");
+    std::string str2="string test";
+    TRACEF("where is the string:%s", str2.c_str());
 
 
 ## Documents
